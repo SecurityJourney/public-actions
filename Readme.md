@@ -1,5 +1,39 @@
 # Public Actions
 
+## get-params
+
+Pulls arbitrary parameters out of AWS SSM and Secrets Manager and puts them in environment variables,
+taking care to mask secret values. 
+
+Ideal for use with [OIDC](https://github.com/aws-actions/configure-aws-credentials).
+
+Example:
+
+```yaml
+  - name: Configure AWS credentials
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      role-to-assume: arn:aws:iam::111111111111:role/my-github-actions-role
+      aws-region: us-east-1
+  - name: Get build parameters
+    uses: hack-edu/public-actions/get-params@main
+    with:
+      secrets:
+        FOO: path/to/my-secret
+      params:
+        BAR: /normal/param
+        BAZ: /secret-string/param
+  - run: |
+      echo "BAR: ${BAR}"
+      echo "BAZ(value will be ****): ${BAZ}"
+      echo "FOO: ${FOO}"
+
+      echo "BAZ=" >> $GITHUB_ENV  # hide the secret from subsequent steps 
+```
+
+NOTE: [Debug logging](https://docs.github.com/en/actions/managing-workflow-runs/enabling-debug-logging) 
+will print parameter values, but secrets will remain masked.
+
 ## update-images
 
 Updates images in a kustomization.yaml file using output from skaffold build.

@@ -1,0 +1,28 @@
+name: Get Parameters
+description: |
+  Retrieves parameters from AWS SSM & Secrets Manager and sets them as environment variables.
+  Secrets are automatically masked.
+
+inputs:
+  params:
+    description: >-
+      YAML mapping of environment variable names to SSM parameters. e.g.,
+         
+         FOO: /param/foo
+
+    required: false
+    default: "{}"
+  secrets:
+    required: false
+    default: "{}"
+    description: |
+      YAML mapping of environment variable names to Secrets Manager keys.
+
+runs:
+  using: composite
+  steps:
+    - run: >-
+        PARAMS="${{ inputs.params }}" 
+        SECRETS="${{ inputs.secrets }}" 
+        ${{ github.action_path }}/get.sh
+      shell: bash
