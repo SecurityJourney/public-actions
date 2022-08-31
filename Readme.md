@@ -78,5 +78,44 @@ build:
 Will generate this update:
 
 ```shell
-kustomize edit set image placeholder-for-image=my-repository/my-image:generate-tag@sha256:<hash>
+kustomize edit set image placeholder-for-image=my-repository/my-image:generate-tag
+```
+
+### I need to rename my image for different kustomize overlays
+
+Use a placeholder for your image:
+
+```yaml
+spec:
+  containers:
+   - name: my-container
+     image: placeholder-for-image
+```
+
+And use a profile to rename the image in skaffold.yaml:
+
+```yaml
+
+profiles:
+  - name: use-ecr
+    patches:
+      - op: replace
+        path: /build/artifacts/0/image
+        value: 123456.dkr.ecr.us-east-1.amazonaws.com/my-image
+```
+
+And build with the profile:
+
+```yaml
+with:
+  working-directory: kustomize/overlays/ecr
+  image-mapping: |
+    placeholder-for-image: my-image$
+  build-args: --profile=use-ecr
+```
+
+Results in:
+
+```shell
+kustomize edit set image placeholder-for-image=123456.dkr.ecr.us-east-1.amazonaws.com/my-image:generate-tag
 ```
