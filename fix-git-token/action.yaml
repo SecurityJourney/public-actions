@@ -1,0 +1,61 @@
+name: Fix Token Based Git Access
+description:
+  Updates .gitconfig to checkout other GitHub repos using an App access token.
+  Dependency management tools like go get need this to checkout private git repos.
+  (Don't forget to set GOPRIVATE for go)
+
+  This action should probably be run before any setup-X action (e.g., setup-go) but
+  after the checkout action.
+
+inputs:
+  token:
+    required: true
+    description: |
+      The GitHub access token.
+  projects:
+    required: true
+    description: |
+      Space separated list of GitHub repos or orgs/users that should use the given token. e.g.,
+      "hack-edu/private-stuff hack-edu/other-stuff" (without leading or trailing slashes).
+
+runs:
+  using: composite
+  steps:
+
+    - name: Fix Git Access
+      shell: bash
+      env:
+        PROJECTS: ${{ inputs.projects }}
+        TOKEN: ${{ inputs.token }}
+      run: |
+        # Use the generated GitHub App token to authenticate checkouts of other repos in the project (e.g. via go get)
+        for PROJECT in $PROJECTS; do          
+          git config --global url."https://x-oauth-token:${TOKEN}@github.com/${PROJECT}/".insteadOf https://github.com/${PROJECT}/
+          git config --global --add url."https://x-oauth-token:${TOKEN}@github.com/${PROJECT}/".insteadOf ssh://git@github.com/${PROJECT}/
+          git config --global --add url."https://x-oauth-token:${TOKEN}@github.com/${PROJECT}/".insteadOf git://github.com/${PROJECT}/
+        done
+
+    - name: Scope Default Token
+      shell: bash
+      run: |
+        # By default, the GHA runner is granted an auth token that gives it read-write
+        # access to this repo only. This token is stored in the local config for this
+        # repo, i.e. in .git/config:
+        #
+        # [http "https://github.com/"]
+        #   extraheader = AUTHORIZATION: basic <base64-token-value>
+        #
+        # Since this token only grants access to this repo, we want to scope it more
+        # precisely so that it doesn't interfere with our ability to fetch dependencies
+        # from other repos, i.e. we want our local .git/config to instead define:
+        #
+        # [http "https://github.com/${GITHUB_REPOSITORY}"]
+        #   extraheader = AUTHORIZATION: basic <base64-token-value>
+        #
+        EXTRA="$(git config --get http.https://github.com/.extraheader)"
+        if [[ ! -z "${EXTRA}" ]]
+        then
+          git config --local http.https://github.com/${GITHUB_REPOSITORY}.extraheader 
+          git config --local --unset http.https://github.com/.extraheader
+        fi
+
