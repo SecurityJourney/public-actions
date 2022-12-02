@@ -52,7 +52,7 @@ runs:
         # [http "https://github.com/${GITHUB_REPOSITORY}"]
         #   extraheader = AUTHORIZATION: basic <base64-token-value>
         #
-        EXTRA="$(git config --get http.https://github.com/.extraheader)"
+        EXTRA="$(git config --get http.https://github.com/.extraheader || echo -n)"
         if [[ ! -z "${EXTRA}" ]]
         then
           git config --local http.https://github.com/${GITHUB_REPOSITORY}.extraheader 
