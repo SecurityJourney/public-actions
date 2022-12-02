@@ -30,6 +30,7 @@ runs:
       run: |
         # Use the generated GitHub App token to authenticate checkouts of other repos in the project (e.g. via go get)
         for PROJECT in $PROJECTS; do          
+          echo "Configuring ${PROJECT} to checkout using the token..."
           git config --global url."https://x-oauth-token:${TOKEN}@github.com/${PROJECT}/".insteadOf https://github.com/${PROJECT}/
           git config --global --add url."https://x-oauth-token:${TOKEN}@github.com/${PROJECT}/".insteadOf ssh://git@github.com/${PROJECT}/
           git config --global --add url."https://x-oauth-token:${TOKEN}@github.com/${PROJECT}/".insteadOf git://github.com/${PROJECT}/
@@ -55,7 +56,10 @@ runs:
         EXTRA="$(git config --get http.https://github.com/.extraheader || echo -n)"
         if [[ ! -z "${EXTRA}" ]]
         then
+          echo "moving extraheader from root to ${GITHUB_REPOSITORY}"
           git config --local http.https://github.com/${GITHUB_REPOSITORY}.extraheader 
           git config --local --unset http.https://github.com/.extraheader
+        else
+          echo "no extraheader"
         fi
 
