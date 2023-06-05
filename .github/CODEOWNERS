@@ -1,0 +1,32 @@
+# Unless otherwise stated, everyone deserves pain 
+*       @SecurityJourney/hackers
+
+*.js    @SecurityJourney/frontend-smes
+*.jsx    @SecurityJourney/frontend-smes
+*.ts    @SecurityJourney/frontend-smes
+
+*.go    @SecurityJourney/golang-smes
+*.proto    @SecurityJourney/golang-smes
+go.sum    @SecurityJourney/golang-smes
+go.mod    @SecurityJourney/golang-smes
+
+*.rb    @SecurityJourney/ruby-smes
+Gemfile    @SecurityJourney/ruby-smes
+Gemfile.lock    @SecurityJourney/ruby-smes
+
+*.py    @SecurityJourney/python-smes
+pytest.ini    @SecurityJourney/python-smes 
+poetry.lock    @SecurityJourney/python-smes
+pyproject.toml    @SecurityJourney/python-smes
+
+/.github/ @SecurityJourney/infrastructure
+atlantis.yaml @SecurityJourney/infrastructure
+/github/ @SecurityJourney/infrastructure
+CODEOWNERS @SecurityJourney/infrastructure
+*.tf @SecurityJourney/infrastructure
+*.tfvars @SecurityJourney/infrastructure
+/k8s/ @SecurityJourney/infrastructure
+/terraform/ @SecurityJourney/infrastructure
+skaffold.yaml @SecurityJourney/infrastructure
+skaffold.yml @SecurityJourney/infrastructure
+kustomization.yml @SecurityJourney/infrastructure
